@@ -1,7 +1,14 @@
 const { Client, Collection, Events, GatewayIntentBits } = require("discord.js");
+require("dotenv").config();
 const fs = require("node:fs");
 const path = require("node:path");
+const mongoose = require("mongoose");
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+function connection() {
+  mongoose.connect(process.env.DB);
+  console.log("DB Connected");
+}
 
 client.commands = new Collection();
 
@@ -19,8 +26,6 @@ for (const file of eventFiles) {
     client.on(event.name, (...args) => event.execute(...args));
   }
 }
-
-const token = require("./config.json").token;
 
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
@@ -45,4 +50,5 @@ client.on(Events.InteractionCreate, (interaction) => {
   console.log(interaction);
 });
 
-client.login(token);
+connection();
+client.login(process.env.token);
